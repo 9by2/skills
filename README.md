@@ -18,7 +18,7 @@ CONTRIBUTING.md         # How to add or revise skills
 
 | Skill | Path | Use when |
 | ----- | ---- | -------- |
-| — | — | No published skills yet. |
+| create-artifact | [`skills/create-artifact/`](skills/create-artifact/) | Creating or publishing interactive HTML artifacts (review bundles, reports) via the artifact CLI. |
 
 ## Installation
 
