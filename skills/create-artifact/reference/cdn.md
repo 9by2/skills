@@ -8,8 +8,11 @@ Update pins deliberately; prefer these exact versions unless broken.
 ## Required
 
 ```html
-<link rel="stylesheet"
+<link id="hljs-theme-dark" rel="stylesheet"
   href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/tokyo-night-dark.min.css"
+  crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link id="hljs-theme-light" rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/tokyo-night-light.min.css"
   crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="stylesheet"
   href="https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/fira_code.css"
@@ -23,15 +26,17 @@ Update pins deliberately; prefer these exact versions unless broken.
   crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 ```
 
-Mermaid is **required** for architecture / flow / sequence content. Init and
-markup rules: `mermaid.md`.
+Enable only the active highlight.js theme (`link.disabled = true` on the
+other) when the shell is light or dark. Mermaid is **required** for
+architecture / flow / sequence content. Init and markup rules: `mermaid.md`.
 
 ## Tailwind browser config
 
-Configure **before** first paint classes matter. Use a `<script type="text/tailwindcss">`
-block (Tailwind v4 browser) with Tokyo Night `@theme` tokens from
-`tokyo-night.md`. Keep `darkMode` as class strategy and force `.dark` on
-`<html>`.
+Configure **before** first paint classes matter. Use a
+`<script type="text/tailwindcss">` block (Tailwind v4 browser) with Tokyo
+Night `@theme` tokens from `tokyo-night.md`. Keep `darkMode` as **class**
+strategy; bootstrap `.dark` from `prefers-color-scheme` / localStorage (do
+not hardcode `class="dark"` on `<html>`).
 
 ## Optional language packs
 
