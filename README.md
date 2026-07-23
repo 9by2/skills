@@ -1,25 +1,63 @@
 # 9by2 Skills
 
-This repository contains reusable agent skills for Bridge Platform work. Skills are plain Markdown directories with a `SKILL.md` file and simple YAML frontmatter, so they can be used by Claude, pi, Codex, OpenCode, or any LLM agent that can read files.
+Reusable [Agent Skills](https://agentskills.io/) for Bridge Platform work. Each skill is a plain Markdown folder with a `SKILL.md` file and YAML frontmatter, so Claude, pi, Codex, OpenCode, Cursor, and other compatible agents can load them the same way.
+
+## Repository layout
+
+```text
+skills/                 # Published skills (one folder per skill)
+  <skill-name>/
+    SKILL.md            # Entrypoint: frontmatter + concise instructions
+    reference/          # Optional deeper docs (singular folder name)
+template/               # Starter copied when creating a new skill
+AGENTS.md               # Conventions for agents working in this repo
+CONTRIBUTING.md         # How to add or revise skills
+```
 
 ## Available skills
 
-| Skill                | Path                                   | Use when             |
-| -------------------- | -------------------------------------- | -------------------- |
-| {example-skill-name} | `skills/{example-skill-path}/SKILL.md` | Example description. |
+| Skill | Path | Use when |
+| ----- | ---- | -------- |
+| — | — | No published skills yet. |
 
 ## Installation
 
-Install the 9by2 skill:
+List skills in this package:
 
 ```bash
-bunx --bun skills add git@github.com:9by2/skills.git --skill {skill-name}
+bunx --bun skills add git@github.com:9by2/skills.git --list
 ```
+
+Install one skill (once published):
+
+```bash
+bunx --bun skills add git@github.com:9by2/skills.git --skill <skill-name>
+```
+
+Install for a specific agent or globally as needed:
+
+```bash
+bunx --bun skills add git@github.com:9by2/skills.git --skill <skill-name> -a cursor -g
+```
+
+You can also vendor a skill folder into a project's `.agents/skills/` or `.cursor/skills/` directory.
+
+## Creating a skill
+
+1. Copy the template: `cp -R template skills/<skill-name>`
+2. Rename frontmatter `name` to match the folder
+3. Fill invocation rules, guide discovery, core principles, workflow, and checklist
+4. Put deeper guidance under `reference/`
+5. Add a row to the table above
 
 ## Maintenance
 
-- Keep each `SKILL.md` as a concise entrypoint with invocation rules, guide discovery, core principles, and a final checklist.
-- Use singular skill support folders such as `reference/`; do not introduce plural support folder names.
-- Put larger reusable guidance in `skills/<name>/reference/` so agents can load only relevant context.
+- Keep each `SKILL.md` as a concise entrypoint with invocation rules, guide discovery, core principles, workflow, and a final checklist.
+- Use singular support folders such as `reference/`; do not introduce plural support folder names.
+- Put larger reusable guidance in `skills/<name>/reference/` so agents load only relevant context.
 - Keep product-specific facts, commands, route inventories, API details, environment variables, and documented deviations in each target project's README.
-- Keep skills plain Markdown and avoid agent-specific APIs so they remain portable across Claude, pi, Codex, and OpenCode.
+- Keep skills plain Markdown and avoid agent-specific APIs so they remain portable across Claude, pi, Codex, OpenCode, and Cursor.
+
+## Spec alignment
+
+Skills follow the [Agent Skills specification](https://agentskills.io/specification) with one intentional house rule: support directories are **singular** (`reference/`, `script/`, `asset/`) instead of the plural names in the upstream examples.
