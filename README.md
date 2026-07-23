@@ -18,7 +18,7 @@ CONTRIBUTING.md         # How to add or revise skills
 
 | Skill | Path | Use when |
 | ----- | ---- | -------- |
-| create-skill | [`skills/create-skill/SKILL.md`](skills/create-skill/SKILL.md) | Authoring or revising skills in this repository. |
+| — | — | No published skills yet. |
 
 ## Installation
 
@@ -28,16 +28,16 @@ List skills in this package:
 bunx --bun skills add git@github.com:9by2/skills.git --list
 ```
 
-Install one skill:
+Install one skill (once published):
 
 ```bash
-bunx --bun skills add git@github.com:9by2/skills.git --skill create-skill
+bunx --bun skills add git@github.com:9by2/skills.git --skill <skill-name>
 ```
 
 Install for a specific agent or globally as needed:
 
 ```bash
-bunx --bun skills add git@github.com:9by2/skills.git --skill create-skill -a cursor -g
+bunx --bun skills add git@github.com:9by2/skills.git --skill <skill-name> -a cursor -g
 ```
 
 You can also vendor a skill folder into a project's `.agents/skills/` or `.cursor/skills/` directory.
@@ -46,8 +46,9 @@ You can also vendor a skill folder into a project's `.agents/skills/` or `.curso
 
 1. Copy the template: `cp -R template skills/<skill-name>`
 2. Rename frontmatter `name` to match the folder
-3. Follow [`skills/create-skill/SKILL.md`](skills/create-skill/SKILL.md) (or invoke the create-skill skill)
-4. Add a row to the table above
+3. Fill invocation rules, guide discovery, core principles, workflow, and checklist
+4. Put deeper guidance under `reference/`
+5. Add a row to the table above
 
 ## Maintenance
 

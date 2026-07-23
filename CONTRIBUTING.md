@@ -19,8 +19,6 @@ Thanks for improving 9by2 skills.
 
 4. Add a row to the Available skills table in `README.md`.
 
-5. Self-check with `skills/create-skill/reference/checklist.md`.
-
 ## Revise a skill
 
 - Prefer clarifying triggers and progressive disclosure over adding length to `SKILL.md`.

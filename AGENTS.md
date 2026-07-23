@@ -15,18 +15,13 @@ This repo publishes portable Agent Skills for Bridge Platform work. Prefer editi
 
 ## When adding or changing a skill
 
-1. Read and follow `skills/create-skill/SKILL.md`.
-2. Start from `template/` unless updating an existing skill.
-3. Keep `SKILL.md` concise: invocation rules, guide discovery, core principles, workflow, checklist.
-4. Use singular support folders only (`reference/`, `script/`, `asset/`).
-5. Do not bake product-specific routes, APIs, env vars, or deviations into skills; point agents at the consuming project's README.
-6. Update the Available skills table in `README.md`.
+1. Start from `template/` unless updating an existing skill.
+2. Keep `SKILL.md` concise: invocation rules, guide discovery, core principles, workflow, checklist.
+3. Use singular support folders only (`reference/`, `script/`, `asset/`).
+4. Do not bake product-specific routes, APIs, env vars, or deviations into skills; point agents at the consuming project's README.
+5. Update the Available skills table in `README.md`.
 
 ## Frontmatter requirements
 
 - `name` must match the parent folder (lowercase, digits, hyphens).
 - `description` must include both what the skill does and when to use it.
-
-## Validation mindset
-
-Before finishing, run through `skills/create-skill/reference/checklist.md`.
