@@ -8,7 +8,9 @@ Reusable [Agent Skills](https://agentskills.io/) for Bridge Platform work. Each 
 skills/                 # Published skills (one folder per skill)
   <skill-name>/
     SKILL.md            # Entrypoint: frontmatter + concise instructions
-    reference/          # Optional deeper docs (singular folder name)
+    reference/          # Optional deeper docs (singular)
+    script/             # Optional helper scripts (singular)
+    asset/              # Optional templates / static assets (singular)
 template/               # Starter copied when creating a new skill
 AGENTS.md               # Conventions for agents working in this repo
 CONTRIBUTING.md         # How to add or revise skills
@@ -18,7 +20,7 @@ CONTRIBUTING.md         # How to add or revise skills
 
 | Skill | Path | Use when |
 | ----- | ---- | -------- |
-| — | — | No published skills yet. |
+| create-artifact | [`skills/create-artifact/`](skills/create-artifact/) | Creating or publishing interactive HTML artifacts (review bundles, reports) via the artifact CLI. |
 
 ## Installation
 
@@ -47,13 +49,13 @@ You can also vendor a skill folder into a project's `.agents/skills/` or `.curso
 1. Copy the template: `cp -R template skills/<skill-name>`
 2. Rename frontmatter `name` to match the folder
 3. Fill invocation rules, guide discovery, core principles, workflow, and checklist
-4. Put deeper guidance under `reference/`
+4. Put deeper guidance under `reference/`; helpers under `script/`; templates under `asset/`
 5. Add a row to the table above
 
 ## Maintenance
 
 - Keep each `SKILL.md` as a concise entrypoint with invocation rules, guide discovery, core principles, workflow, and a final checklist.
-- Use singular support folders such as `reference/`; do not introduce plural support folder names.
+- Use singular support folders only (`reference/`, `script/`, `asset/`); do not introduce plural names (`references/`, `scripts/`, `assets/`).
 - Put larger reusable guidance in `skills/<name>/reference/` so agents load only relevant context.
 - Keep product-specific facts, commands, route inventories, API details, environment variables, and documented deviations in each target project's README.
 - Keep skills plain Markdown and avoid agent-specific APIs so they remain portable across Claude, pi, Codex, OpenCode, and Cursor.
