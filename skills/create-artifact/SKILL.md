@@ -33,8 +33,9 @@ Reference shape: https://artifact.9by2.workers.dev/artifact/019f8d42-27fc-703c-a
    the upload root). Must include root `index.html`.
 4. **Upload:** Publish with the `artifact` CLI (`artifact upload …`), never
    raw `curl` to the Worker unless debugging the CLI itself.
-5. **CLI:** Assume the CLI may be missing. Run `script/ensure-cli.sh` (or
-   the inline install below) **before** `artifact id` / `artifact upload`.
+5. **CLI:** Assume the CLI may be missing or stale. Run `script/ensure-cli.sh`
+   (or the inline install below) **before** `artifact upload`. Prefer
+   `artifact update` when a binary already exists.
 6. **Eval evidence:** If the user asks for eval / verification / screenshots /
    video proof, capture evidence into `/tmp/{sessionId}/evidence/` with
    Playwright (images) and/or ffmpeg (video), reference it in the HTML, and
@@ -69,11 +70,15 @@ All generated HTML, CSS/JS you author locally, media, and evidence go under
 command -v artifact >/dev/null 2>&1 || \
   curl -fsSL https://artifact.9by2.workers.dev/install.sh | sh
 export PATH="${ARTIFACT_INSTALL_DIR:-$HOME/.local/bin}:$PATH"
+# refresh an existing install when the Worker has a newer release
+command -v artifact >/dev/null 2>&1 && artifact update
 artifact --version
 ```
 
 Preferred: run `script/ensure-cli.sh` from this skill folder. It installs
 into `~/.local/bin` when missing and prints the resolved `artifact` path.
+When the binary already exists, run `artifact update` so agents pick up CLI
+changes (optional `--id`, API key auth, etc.).
 
 ## Step 1 — Scaffold
 
@@ -105,6 +110,9 @@ Layout pattern (match the example's job, not its green paper theme):
 
 - Sticky sidebar: brand, status badges, doc nav + section anchors
 - Main: one `<article>` per doc; toggle `.active` via small inline JS
+- **No width caps on `<article>`:** never add `max-w-*` (or similar) to the
+  article / main content column — it should use the full width beside the
+  sidebar. `max-w-full` on media/SVG to prevent overflow is fine.
 - Sections: eyebrow + heading + prose / tables / callouts / checklists
 - **Mermaid (required):** `<pre class="mermaid">…</pre>` + cdnjs Mermaid 11,
   initialized with `startOnLoad: false` and `mermaid.run` on the active doc
@@ -168,25 +176,32 @@ evidence when the user required eval.
 ```bash
 script/ensure-cli.sh
 export PATH="${ARTIFACT_INSTALL_DIR:-$HOME/.local/bin}:$PATH"
+artifact update >/dev/null 2>&1 || true
 
-ARTIFACT_ID="${ARTIFACT_ID:-$(artifact id)}"
-# ARTIFACT_PASSCODE must be set (env / .dev.vars local / user secret)
+# ARTIFACT_API_KEY must be set (Studio API key / user secret)
 # ARTIFACT_ENDPOINT defaults to https://artifact.9by2.workers.dev
 
 artifact upload "$ROOT" \
-  --id "$ARTIFACT_ID" \
   --yes \
   --json
 ```
 
+To publish another revision of an existing artifact, pass the prior id:
+
+```bash
+artifact upload "$ROOT" --id "$ARTIFACT_ID" --yes --json
+```
+
 Rules from the product CLI:
 
-- `--id` required (UUID v4 / v7 / 21-char NanoID). Prefer `artifact id`.
+- `--id` **optional** (UUID v4 / v7 / 21-char NanoID). Omit to let the CLI
+  generate one; pass it only when updating an existing artifact. `artifact id`
+  remains available when you need a NanoID ahead of time (e.g. session paths).
 - Omit `--revision` to create a new revision; retries of identical bytes are
   idempotent; changed bytes under the same revision → `409`.
-- Passcode: `ARTIFACT_PASSCODE` or `--passcode` (never commit secrets).
+- Auth: `ARTIFACT_API_KEY` or `--api-key` (never commit secrets).
 - Local Worker: `--endpoint http://localhost:8787`.
-- Print the returned `url` / `revisionUrl` to the user.
+- Print the returned `url` / `revisionUrl` (and `id`) to the user.
 
 Example success payload:
 
@@ -207,8 +222,9 @@ Give the user:
 
 1. Public URL (`url`)
 2. Immutable revision URL (`revisionUrl`)
-3. `sessionId` / local path `/tmp/{sessionId}`
-4. Whether evidence was included
+3. Artifact `id` (needed for later revisions)
+4. `sessionId` / local path `/tmp/{sessionId}`
+5. Whether evidence was included
 
 ## Anti-patterns
 
@@ -216,7 +232,8 @@ Give the user:
 - Writing the bundle into the repo working tree by default
 - Loading scripts from non-Cloudflare CDNs
 - Non–Tokyo Night light themes / purple-gradient / cream-serif redesigns
-- Skipping CLI install check
+- Putting `max-w-*` on `<article>` / the main content column
+- Skipping CLI install / update check
 - Claiming eval passed without image/video files in `evidence/`
 - Leaving Mermaid source unrendered (no script, or hidden-doc `startOnLoad` only)
 

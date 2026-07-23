@@ -177,25 +177,25 @@
     </aside>
 
     <main class="px-[clamp(1.1rem,4vw,3rem)] pt-10 pb-20 box-border">
-      <article class="doc active max-w-[50rem] flex-col gap-10" id="doc-a">
+      <article class="doc active flex-col gap-10" id="doc-a">
         <header class="border-b-2 border-tn-fg-bright pb-4 flex flex-col gap-2">
           <span class="font-mono text-[0.72rem] text-tn-fg-dim">{{DOC_A_PATH}}</span>
           <h2 class="m-0 text-[1.75rem] leading-tight font-semibold text-tn-fg-bright text-balance">{{DOC_A_HEADING}}</h2>
-          <p class="m-0 text-[0.92rem] text-tn-fg-dim max-w-[65ch]">{{DOC_A_LEDE}}</p>
+          <p class="m-0 text-[0.92rem] text-tn-fg-dim">{{DOC_A_LEDE}}</p>
         </header>
 
         <section class="flex flex-col gap-3" id="a-status">
           <span class="text-[0.68rem] font-semibold tracking-[0.12em] uppercase text-tn-magenta">Status</span>
           <h3 class="m-0 text-[1.28rem] font-semibold text-tn-fg-bright border-b border-tn-border pb-2">{{STATUS_HEADING}}</h3>
           <div class="border-l-[3px] border-tn-blue bg-tn-bg-highlight rounded-r-lg px-4 py-3">
-            <p class="m-0 text-[0.9rem] max-w-none">{{STATUS_CALLOUT}}</p>
+            <p class="m-0 text-[0.9rem]">{{STATUS_CALLOUT}}</p>
           </div>
         </section>
 
         <section class="flex flex-col gap-3" id="a-background">
           <span class="text-[0.68rem] font-semibold tracking-[0.12em] uppercase text-tn-magenta">Background</span>
           <h3 class="m-0 text-[1.28rem] font-semibold text-tn-fg-bright border-b border-tn-border pb-2">Why this exists</h3>
-          <p class="m-0 max-w-[68ch]">{{BACKGROUND}}</p>
+          <p class="m-0">{{BACKGROUND}}</p>
           <div class="overflow-x-auto bg-tn-bg-highlight border border-tn-border rounded-xl">
             <table class="w-full border-collapse text-sm">
               <thead>
@@ -238,14 +238,14 @@
 </pre>
             <figcaption class="text-xs text-tn-fg-dim pt-3 mt-3 border-t border-dashed border-tn-border">Mermaid sequence diagram</figcaption>
           </figure>
-          <pre><code class="language-bash">artifact upload /tmp/SESSION --id "$(artifact id)" --yes --json</code></pre>
+          <pre><code class="language-bash">artifact upload /tmp/SESSION --yes --json</code></pre>
         </section>
 
         <!-- Include when eval evidence was captured -->
         <section class="flex flex-col gap-3" id="a-evidence">
           <span class="text-[0.68rem] font-semibold tracking-[0.12em] uppercase text-tn-magenta">Evidence</span>
           <h3 class="m-0 text-[1.28rem] font-semibold text-tn-fg-bright border-b border-tn-border pb-2">Eval captures</h3>
-          <p class="m-0 max-w-[68ch] text-tn-fg-dim">Replace or remove this section when evidence is not required. Paths are relative to the uploaded folder.</p>
+          <p class="m-0 text-tn-fg-dim">Replace or remove this section when evidence is not required. Paths are relative to the uploaded folder.</p>
           <figure class="m-0 bg-tn-bg-highlight border border-tn-border rounded-xl p-4 overflow-x-auto">
             <img class="max-w-full h-auto rounded-md border border-tn-border" src="./evidence/desktop.png" alt="Desktop shell screenshot" />
             <figcaption class="text-xs text-tn-fg-dim pt-3 mt-3 border-t border-dashed border-tn-border">Playwright — desktop full page</figcaption>
