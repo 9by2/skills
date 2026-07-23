@@ -19,6 +19,10 @@ resolve_artifact() {
 }
 
 if ARTIFACT_BIN="$(resolve_artifact)"; then
+  # Keep an existing install current when `artifact update` is available.
+  if "$ARTIFACT_BIN" update -h >/dev/null 2>&1; then
+    "$ARTIFACT_BIN" update >/dev/null 2>&1 || true
+  fi
   printf '%s\n' "$ARTIFACT_BIN"
   exit 0
 fi
