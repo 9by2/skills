@@ -42,16 +42,20 @@ Supported diagram kinds (use freely when they clarify the review):
 Hidden articles use `display: none`. `startOnLoad: true` mis-measures those
 nodes. Always:
 
-1. `mermaid.initialize({ startOnLoad: false, theme: "dark", … })`
-2. Call `mermaid.run({ nodes })` for the **visible** doc after show
-3. Skip nodes that already have `data-processed`
+1. Stash each node's text into `data-mermaid-source` before the first render
+2. `mermaid.initialize({ startOnLoad: false, theme, themeVariables })` using
+   dark or light Tokyo Night vars from `tokyo-night.md`
+3. Call `mermaid.run({ nodes })` for the **visible** doc after show
+4. Skip nodes that already have `data-processed`
+5. On theme toggle: restore text from `data-mermaid-source`, clear
+   `data-processed`, re-`initialize`, then `run` the active doc
 
 ```js
 mermaid.initialize({
   startOnLoad: false,
-  theme: "dark",
+  theme: isDark ? "dark" : "base",
   securityLevel: "strict",
-  themeVariables: { /* Tokyo Night — see tokyo-night.md */ },
+  themeVariables: isDark ? tokyoNightDark : tokyoNightLight,
 });
 
 function renderMermaid(root) {
@@ -67,8 +71,10 @@ the initially active article.
 
 ## Theme
 
-Keep Mermaid on `theme: "dark"` plus Tokyo Night `themeVariables` from
-`tokyo-night.md`. Do not use the default light Mermaid palette.
+Pair Mermaid with the shell theme: `theme: "dark"` + high-contrast Tokyo Night
+variables in dark mode; `theme: "base"` + Tokyo Night Light variables in light
+mode. Copy exact hex maps from `tokyo-night.md`. Do not use Mermaid's default
+light pastel palette.
 
 ## Eval checks
 
@@ -85,3 +91,4 @@ await page.waitForSelector(".mermaid svg", { timeout: 5000 });
 - `startOnLoad: true` alone in a multi-doc `display:none` shell
 - Loading Mermaid from jsDelivr / unpkg
 - Putting Mermaid source inside `<code>` (highlight.js will steal it)
+- Theme toggle that leaves stale Mermaid SVGs from the previous palette

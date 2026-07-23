@@ -4,8 +4,9 @@ description: >
   Create and publish a Claude-style interactive HTML artifact via the
   artifact CLI. Use when the user asks to create an artifact, review bundle,
   HTML report, proposal viewer, or upload a static folder to
-  artifact.9by2.workers.dev. Opinionated: Tailwind class dark mode + Tokyo
-  Night theme; CSS/JS only from cdnjs.cloudflare.com. Writes to
+  artifact.9by2.workers.dev. Opinionated: Tailwind class theme + Tokyo Night
+  (high-contrast dark) / Tokyo Night Light, with dark/light switcher defaulting
+  to prefers-color-scheme; CSS/JS only from cdnjs.cloudflare.com. Writes to
   /tmp/{sessionId}, optionally captures Playwright/ffmpeg evidence for eval,
   then uploads the whole folder with the artifact CLI (auto-installs CLI).
   Directory names are singular (asset/, reference/, script/) per repo rules.
@@ -21,8 +22,10 @@ Reference shape: https://artifact.9by2.workers.dev/artifact/019f8d42-27fc-703c-a
 
 ## Non-negotiables
 
-1. **Theme:** Tailwind **class** dark mode + **Tokyo Night** tokens only.
-   Always force dark: `<html class="dark" data-theme="tokyo-night">`.
+1. **Theme:** Tailwind **class** strategy + **Tokyo Night** (dark, high
+   contrast) / **Tokyo Night Light**. Bootstrap from `prefers-color-scheme`
+   (persist via `localStorage["artifact-theme"]`); include a dark/light
+   switcher. Never invent a third palette.
 2. **CDN:** Load CSS/JS only from `cdnjs.cloudflare.com` (Cloudflare CDN).
    No jsDelivr, unpkg, Google Fonts, `cdn.tailwindcss.com`, or npm-bundled
    browser assets inside the artifact.
@@ -106,24 +109,25 @@ Layout pattern (match the example's job, not its green paper theme):
 - **Mermaid (required):** `<pre class="mermaid">…</pre>` + cdnjs Mermaid 11,
   initialized with `startOnLoad: false` and `mermaid.run` on the active doc
   (see `reference/mermaid.md`). Flowcharts and sequence diagrams at minimum.
-- Code: `<pre><code class="language-…">` + highlight.js `tokyo-night-dark`
-  — never put Mermaid source inside `<code>` or highlight.js will claim it
+- Code: `<pre><code class="language-…">` + highlight.js tokyo-night dark/light
+  stylesheets (toggle with theme) — never put Mermaid source inside `<code>`
+  or highlight.js will claim it
+- Theme switcher in the shell (see template); follow `reference/tokyo-night.md`
 
 Allowed CDN libs (pin versions — see `reference/cdn.md`):
 
 | Lib | Role |
 | --- | --- |
 | `tailwindcss-browser` | Tailwind v4 browser runtime |
-| `highlight.js` + `styles/tokyo-night-dark.min.css` | Code highlighting |
+| `highlight.js` + tokyo-night dark **and** light CSS | Code highlighting |
 | `mermaid` **required** | Client-side diagram rendering |
 | `firacode` | Monospace |
-
-Do **not** add light-mode toggle. Dark Tokyo Night is the product look.
 
 ### Mermaid checklist
 
 1. Script tag from cdnjs (`mermaid/11.12.0/mermaid.min.js`)
-2. Tokyo Night `themeVariables` (copy from template / `tokyo-night.md`)
+2. Dark + light Tokyo Night `themeVariables` (copy from template /
+   `tokyo-night.md`); re-init + re-run on theme change
 3. `startOnLoad: false` + `mermaid.run({ nodes })` after doc becomes visible
 4. At least one real diagram when the content involves architecture, flow,
    sequence, or state — prefer diagrams over long prose for those bits
@@ -211,7 +215,7 @@ Give the user:
 - Single-file paste upload via `POST /artifact` when a folder exists — use CLI
 - Writing the bundle into the repo working tree by default
 - Loading scripts from non-Cloudflare CDNs
-- Light theme / purple-gradient / cream-serif redesigns
+- Non–Tokyo Night light themes / purple-gradient / cream-serif redesigns
 - Skipping CLI install check
 - Claiming eval passed without image/video files in `evidence/`
 - Leaving Mermaid source unrendered (no script, or hidden-doc `startOnLoad` only)
