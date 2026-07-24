@@ -153,6 +153,12 @@
           <span class="text-[0.66rem] font-semibold tracking-wide px-2 py-0.5 rounded-full border border-tn-border text-tn-fg-dim">{{BADGE_META}}</span>
           <span class="text-[0.66rem] font-semibold tracking-wide px-2 py-0.5 rounded-full bg-tn-blue text-tn-bg border border-tn-blue">{{BADGE_STATUS}}</span>
         </div>
+        <label id="revision-switcher" class="hidden flex-col gap-1 pt-2">
+          <span class="text-[0.66rem] font-semibold tracking-wide uppercase text-tn-fg-dim">Revision</span>
+          <select id="revision-select"
+            class="w-full text-[0.72rem] font-mono bg-tn-bg text-tn-fg border border-tn-border rounded-md px-2 py-1.5 hover:border-tn-blue focus-visible:outline focus-visible:outline-2 focus-visible:outline-tn-blue"
+            aria-label="Artifact revision"></select>
+        </label>
       </div>
 
       <nav class="flex flex-col gap-4" aria-label="Documents">
@@ -440,6 +446,81 @@
         var first = document.querySelector("article.doc.active") || document.querySelector("article.doc");
         if (first) show(first.id);
       }
+
+      // Revision dropdown — GET /artifact/:id/revisions when hosted on the Worker.
+      (function initRevisionSwitcher() {
+        var shell = document.getElementById("revision-switcher");
+        var select = document.getElementById("revision-select");
+        if (!shell || !select) return;
+
+        var match = location.pathname.match(
+          /^\/artifact\/([^/]+)(?:\/revision\/([^/]+))?\/?/u
+        );
+        if (!match || !match[1]) return;
+
+        var artifactId = match[1];
+        var currentRevision = match[2] || null;
+        var revisionsUrl = new URL(
+          "/artifact/" + encodeURIComponent(artifactId) + "/revisions",
+          location.href
+        ).href;
+
+        function shortId(id) {
+          return id.length <= 12 ? id : id.slice(0, 8) + "…" + id.slice(-4);
+        }
+
+        function formatWhen(unix) {
+          if (unix == null || !Number.isFinite(Number(unix))) return "";
+          try {
+            return new Date(Number(unix) * 1000).toISOString().slice(0, 16).replace("T", " ") + " UTC";
+          } catch (e) {
+            return "";
+          }
+        }
+
+        fetch(revisionsUrl, { credentials: "omit" })
+          .then(function (res) {
+            if (!res.ok) throw new Error("revisions " + res.status);
+            return res.json();
+          })
+          .then(function (payload) {
+            var revisions = (payload && payload.revisions) || [];
+            if (!revisions.length) return;
+
+            var published = payload.published || null;
+            if (!currentRevision) currentRevision = published;
+
+            select.innerHTML = "";
+            revisions.forEach(function (rev) {
+              if (!rev || !rev.id || !rev.revisionPath) return;
+              var opt = document.createElement("option");
+              opt.value = rev.revisionPath;
+              var label = shortId(rev.id);
+              var when = formatWhen(rev.publishedAt != null ? rev.publishedAt : rev.createdAt);
+              if (when) label += " · " + when;
+              if (rev.id === published) label += " · current";
+              else if (rev.status) label += " · " + rev.status;
+              opt.textContent = label;
+              if (rev.id === currentRevision) opt.selected = true;
+              select.appendChild(opt);
+            });
+
+            if (!select.options.length) return;
+            shell.classList.remove("hidden");
+            shell.classList.add("flex");
+
+            select.addEventListener("change", function () {
+              var path = select.value;
+              if (!path) return;
+              var next = new URL(path, location.href);
+              next.hash = location.hash;
+              if (next.href !== location.href) location.assign(next.href);
+            });
+          })
+          .catch(function () {
+            /* local preview or CORS — keep switcher hidden */
+          });
+      })();
     })();
   </script>
 </body>
