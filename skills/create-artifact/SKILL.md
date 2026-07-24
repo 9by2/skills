@@ -108,11 +108,19 @@ Follow `reference/tokyo-night.md` and the template.
 
 Layout pattern (match the example's job, not its green paper theme):
 
-- Sticky sidebar: brand, status badges, doc nav + section anchors
+- Sticky sidebar: brand, status badges, **revision dropdown**, doc nav +
+  section anchors
 - Main: one `<article>` per doc; toggle `.active` via small inline JS
 - **No width caps on `<article>`:** never add `max-w-*` (or similar) to the
   article / main content column — it should use the full width beside the
   sidebar. `max-w-full` on media/SVG to prevent overflow is fine.
+- **Revision switcher (required in template):** when hosted at
+  `/artifact/:id` or `/artifact/:id/revision/:rev`, fetch
+  `/artifact/:id/revisions` and render a sidebar `<select>` that navigates to
+  each entry's `revisionPath`. Hide the control when the list is unavailable
+  (local preview). Keep the template JS aligned with the Worker payload:
+  `{ id, published, revisions: [{ id, status, createdAt, publishedAt, revisionPath }] }`
+  (`createdAt` / `publishedAt` are Unix seconds).
 - Sections: eyebrow + heading + prose / tables / callouts / checklists
 - **Mermaid (required):** `<pre class="mermaid">…</pre>` + cdnjs Mermaid 11,
   initialized with `startOnLoad: false` and `mermaid.run` on the active doc
@@ -244,6 +252,7 @@ Give the user:
 | Pinned CDN URLs | `reference/cdn.md` |
 | Color tokens / Tailwind theme | `reference/tokyo-night.md` |
 | Mermaid init + markup | `reference/mermaid.md` |
+| Revision list API + dropdown | `reference/revisions.md` |
 | HTML shell | `asset/index.template.html` |
 | CLI bootstrap | `script/ensure-cli.sh` |
 | Screenshots / video | `script/capture-evidence.mjs` |
