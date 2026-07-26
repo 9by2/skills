@@ -121,6 +121,15 @@ Layout pattern (match the example's job, not its green paper theme):
   (local preview). Keep the template JS aligned with the Worker payload:
   `{ id, published, revisions: [{ id, status, createdAt, publishedAt, revisionPath }] }`
   (`createdAt` / `publishedAt` are Unix seconds).
+- **Revision diff toggle (required in template):** sidebar **Diff** button that
+  re-renders the whole page as a delta vs the previous revision — word-level
+  `<ins class="diff">` / `<del class="diff">`, block add/remove ghosts, and
+  "updated" chips for mermaid/images/code (jsdiff 7 via cdnjs; client-side
+  only). Hidden on the first revision. **When republishing with `--id`, embed
+  the previous revision's `<main>` in `<template id="diff-prev-snapshot">`** —
+  the Worker's sandbox CSP blocks cross-revision fetch, so the snapshot is the
+  reliable diff source. **Keep section `id`s / `data-diff-key` values stable
+  across revisions** — they are the diff anchors. See `reference/diff.md`.
 - Sections: eyebrow + heading + prose / tables / callouts / checklists
 - **Mermaid (required):** `<pre class="mermaid">…</pre>` + cdnjs Mermaid 11,
   initialized with `startOnLoad: false` and `mermaid.run` on the active doc
@@ -137,6 +146,7 @@ Allowed CDN libs (pin versions — see `reference/cdn.md`):
 | `tailwindcss-browser` | Tailwind v4 browser runtime |
 | `highlight.js` + tokyo-night dark **and** light CSS | Code highlighting |
 | `mermaid` **required** | Client-side diagram rendering |
+| `jsdiff` **required** | Revision diff toggle (word/block delta) |
 | `firacode` | Monospace |
 
 ### Mermaid checklist
@@ -242,6 +252,10 @@ Give the user:
 - Non–Tokyo Night light themes / purple-gradient / cream-serif redesigns
 - Putting `max-w-*` on `<article>` / the main content column
 - Skipping CLI install / update check
+- Renaming section ids / `data-diff-key` between revisions (breaks diff toggle)
+- Dropping the Diff button or the `jsdiff` script when re-publishing with `--id`
+- Republishing with `--id` without the `#diff-prev-snapshot` template (diff
+  toggle will have nothing to compare against under the sandbox CSP)
 - Claiming eval passed without image/video files in `evidence/`
 - Leaving Mermaid source unrendered (no script, or hidden-doc `startOnLoad` only)
 
@@ -253,6 +267,7 @@ Give the user:
 | Color tokens / Tailwind theme | `reference/tokyo-night.md` |
 | Mermaid init + markup | `reference/mermaid.md` |
 | Revision list API + dropdown | `reference/revisions.md` |
+| Revision diff toggle + authoring rules | `reference/diff.md` |
 | HTML shell | `asset/index.template.html` |
 | CLI bootstrap | `script/ensure-cli.sh` |
 | Screenshots / video | `script/capture-evidence.mjs` |

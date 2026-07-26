@@ -68,6 +68,8 @@
       --tn-red: #8c4351;
       --tn-comment: #6c6e75;
       --tn-border: #c1c2c7;
+      --diff-ins-bg: rgba(51, 99, 92, 0.16);
+      --diff-del-bg: rgba(140, 67, 81, 0.14);
     }
 
     .dark {
@@ -86,6 +88,8 @@
       --tn-red: #f7768e;
       --tn-comment: #7a8199;
       --tn-border: #4a5270;
+      --diff-ins-bg: rgba(158, 206, 106, 0.16);
+      --diff-del-bg: rgba(247, 118, 142, 0.16);
     }
 
     html { scroll-behavior: smooth; }
@@ -120,10 +124,73 @@
       @apply bg-tn-bg-dark border border-tn-border rounded-lg text-[0.79rem] leading-relaxed;
     }
 
-    /* Button label = mode you switch into */
+    /* Icon buttons (Lucide inline SVG) */
+    .icon-btn svg { width: 0.95rem; height: 0.95rem; display: block; }
+
+    /* Button icon = mode you switch into */
+    .theme-switch [data-mode] { display: inline-flex; }
     .theme-switch [data-mode="light"] { display: none; }
     .dark .theme-switch [data-mode="dark"] { display: none; }
-    .dark .theme-switch [data-mode="light"] { display: inline; }
+    .dark .theme-switch [data-mode="light"] { display: inline-flex; }
+
+    /* Revision diff (global toggle) — see reference/diff.md */
+    ins.diff {
+      text-decoration: none;
+      color: var(--tn-green);
+      background: var(--diff-ins-bg);
+      border-radius: 3px;
+      padding: 0 2px;
+      box-shadow: inset 0 -1px 0 0 color-mix(in srgb, var(--tn-green) 55%, transparent);
+    }
+    del.diff {
+      color: var(--tn-red);
+      background: var(--diff-del-bg);
+      border-radius: 3px;
+      padding: 0 2px;
+      text-decoration: line-through;
+      text-decoration-thickness: 1.5px;
+    }
+    .diff-block-added {
+      border-left: 3px solid var(--tn-green);
+      background: var(--diff-ins-bg);
+      padding: 0.35rem 0.6rem;
+      border-radius: 0 0.5rem 0.5rem 0;
+    }
+    .diff-block-removed {
+      border-left: 3px solid var(--tn-red);
+      background: var(--diff-del-bg);
+      padding: 0.35rem 0.6rem;
+      border-radius: 0 0.5rem 0.5rem 0;
+      opacity: 0.8;
+      text-decoration: line-through;
+      text-decoration-color: color-mix(in srgb, var(--tn-red) 70%, transparent);
+    }
+    .diff-block-updated {
+      position: relative;
+      outline: 1px dashed var(--tn-yellow);
+      outline-offset: 4px;
+      border-radius: 4px;
+    }
+    .diff-block-updated::after {
+      content: "updated";
+      position: absolute;
+      top: -0.7rem;
+      right: 0;
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--tn-yellow);
+      background: var(--tn-bg-highlight);
+      border: 1px solid var(--tn-yellow);
+      border-radius: 9999px;
+      padding: 0 0.45rem;
+    }
+    #diff-toggle[aria-pressed="true"] {
+      background: var(--tn-magenta);
+      border-color: var(--tn-magenta);
+      color: var(--tn-bg);
+    }
   </style>
   <script>
     (function () {
@@ -141,12 +208,39 @@
       <div class="flex flex-col gap-2 pb-4 border-b border-tn-border">
         <div class="flex items-start justify-between gap-2">
           <h1 class="m-0 text-lg font-semibold tracking-tight text-tn-fg-bright">{{BRAND}}</h1>
-          <button type="button" id="theme-toggle"
-            class="theme-switch shrink-0 text-[0.66rem] font-semibold tracking-wide px-2 py-1 rounded-md border border-tn-border text-tn-fg-dim bg-tn-bg hover:text-tn-fg-bright hover:border-tn-blue focus-visible:outline focus-visible:outline-2 focus-visible:outline-tn-blue"
-            aria-label="Toggle color theme">
-            <span data-mode="light">Light</span>
-            <span data-mode="dark">Dark</span>
-          </button>
+          <div class="flex shrink-0 gap-1.5">
+            <!-- Lucide: file-diff -->
+            <button type="button" id="diff-toggle" aria-pressed="false"
+              class="icon-btn hidden items-center justify-center p-1.5 rounded-md border border-tn-border text-tn-fg-dim bg-tn-bg hover:text-tn-fg-bright hover:border-tn-magenta focus-visible:outline focus-visible:outline-2 focus-visible:outline-tn-magenta"
+              aria-label="Toggle revision diff view"
+              title="Highlight changes vs previous revision">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/>
+                <path d="M9 10h6"/><path d="M12 13V7"/><path d="M9 17h6"/>
+              </svg>
+            </button>
+            <!-- Lucide: moon / sun (icon = mode you switch into) -->
+            <button type="button" id="theme-toggle"
+              class="theme-switch icon-btn inline-flex items-center justify-center p-1.5 rounded-md border border-tn-border text-tn-fg-dim bg-tn-bg hover:text-tn-fg-bright hover:border-tn-blue focus-visible:outline focus-visible:outline-2 focus-visible:outline-tn-blue"
+              aria-label="Toggle color theme" title="Toggle dark / light theme">
+              <span data-mode="light" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/>
+                  <path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/>
+                  <path d="M2 12h2"/><path d="M20 12h2"/>
+                  <path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>
+                </svg>
+              </span>
+              <span data-mode="dark" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+                </svg>
+              </span>
+            </button>
+          </div>
         </div>
         <p class="m-0 text-xs text-tn-fg-dim">{{SUBTITLE}}</p>
         <div class="flex flex-wrap gap-1.5 pt-1">
@@ -159,6 +253,7 @@
             class="w-full text-[0.72rem] font-mono bg-tn-bg text-tn-fg border border-tn-border rounded-md px-2 py-1.5 hover:border-tn-blue focus-visible:outline focus-visible:outline-2 focus-visible:outline-tn-blue"
             aria-label="Artifact revision"></select>
         </label>
+        <p id="diff-summary" class="hidden m-0 pt-1 text-[0.68rem] font-mono text-tn-fg-dim" aria-live="polite"></p>
       </div>
 
       <nav class="flex flex-col gap-4" aria-label="Documents">
@@ -265,9 +360,23 @@
     </main>
   </div>
 
+  <!--
+    Revision diff snapshot (REQUIRED when republishing with `artifact upload --id`).
+    Paste the PREVIOUS revision's <main>…</main> inside this template so the
+    Diff toggle works even though the Worker's sandbox CSP (origin "null")
+    blocks cross-revision fetches. Keep it OUT of the first revision.
+    See reference/diff.md.
+
+  <template id="diff-prev-snapshot" data-revision="{{PREV_REVISION_ID}}">
+    <main> …previous revision main content… </main>
+  </template>
+  -->
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.min.js"
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsdiff/7.0.0/diff.min.js"
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script>
     (function () {
@@ -447,23 +556,31 @@
         if (first) show(first.id);
       }
 
-      // Revision dropdown — GET /artifact/:id/revisions when hosted on the Worker.
-      (function initRevisionSwitcher() {
-        var shell = document.getElementById("revision-switcher");
-        var select = document.getElementById("revision-select");
-        if (!shell || !select) return;
-
+      // Shared revisions payload — used by the dropdown and the diff toggle.
+      var revisionsState = { promise: null, artifactId: null, currentRevision: null };
+      (function () {
         var match = location.pathname.match(
           /^\/artifact\/([^/]+)(?:\/revision\/([^/]+))?\/?/u
         );
         if (!match || !match[1]) return;
+        revisionsState.artifactId = match[1];
+        revisionsState.currentRevision = match[2] || null;
+        revisionsState.promise = fetch(
+          new URL("/artifact/" + encodeURIComponent(match[1]) + "/revisions", location.href).href,
+          { credentials: "omit" }
+        ).then(function (res) {
+          if (!res.ok) throw new Error("revisions " + res.status);
+          return res.json();
+        });
+      })();
 
-        var artifactId = match[1];
-        var currentRevision = match[2] || null;
-        var revisionsUrl = new URL(
-          "/artifact/" + encodeURIComponent(artifactId) + "/revisions",
-          location.href
-        ).href;
+      // Revision dropdown.
+      (function initRevisionSwitcher() {
+        var shell = document.getElementById("revision-switcher");
+        var select = document.getElementById("revision-select");
+        if (!shell || !select || !revisionsState.promise) return;
+
+        var currentRevision = revisionsState.currentRevision;
 
         function shortId(id) {
           return id.length <= 12 ? id : id.slice(0, 8) + "…" + id.slice(-4);
@@ -478,11 +595,7 @@
           }
         }
 
-        fetch(revisionsUrl, { credentials: "omit" })
-          .then(function (res) {
-            if (!res.ok) throw new Error("revisions " + res.status);
-            return res.json();
-          })
+        revisionsState.promise
           .then(function (payload) {
             var revisions = (payload && payload.revisions) || [];
             if (!revisions.length) return;
@@ -520,6 +633,225 @@
           .catch(function () {
             /* local preview or CORS — keep switcher hidden */
           });
+      })();
+
+      // Global revision diff toggle — compares this page with the previous
+      // revision (word-level ins/del + block add/remove + "updated" chips).
+      // Contract and authoring rules: reference/diff.md
+      (function initDiffToggle() {
+        var btn = document.getElementById("diff-toggle");
+        var summary = document.getElementById("diff-summary");
+        // Embedded snapshot of the previous revision's <main> (inert). The
+        // artifact Worker serves pages with a sandboxing CSP (origin "null")
+        // and revision HTML has no CORS headers, so cross-revision fetch can
+        // fail — the snapshot is the reliable path. See reference/diff.md.
+        var snapshotTpl = document.getElementById("diff-prev-snapshot");
+        if (!btn || !window.Diff) return;
+        if (!revisionsState.promise && !snapshotTpl) return;
+
+        var PROSE = "p,h1,h2,h3,h4,h5,h6,li,figcaption,blockquote,dt,dd,td,th,span,a";
+        var RECURSE = "ul,ol,div,figure,section,header,table,thead,tbody,tr";
+        var prevRevision = null;
+        var prevRootPromise = null;
+        var stash = null;
+        var counts = null;
+        var on = false;
+
+        if (snapshotTpl) btn.classList.remove("hidden");
+        if (revisionsState.promise) {
+          revisionsState.promise.then(function (payload) {
+            var revisions = (payload && payload.revisions) || [];
+            var current = revisionsState.currentRevision || payload.published;
+            var idx = -1;
+            revisions.some(function (rev, i) {
+              if (rev && rev.id === current) { idx = i; return true; }
+              return false;
+            });
+            var prev = idx >= 0 ? revisions[idx + 1] : null;
+            if (!prev || !prev.revisionPath) return; // oldest revision
+            prevRevision = prev;
+            btn.classList.remove("hidden");
+          }).catch(function () {});
+        }
+
+        function prevLabel() {
+          if (prevRevision) return prevRevision.id;
+          if (snapshotTpl) return snapshotTpl.getAttribute("data-revision") || "previous";
+          return "previous";
+        }
+
+        function loadPrevRoot() {
+          if (prevRootPromise) return prevRootPromise;
+          var viaFetch = prevRevision
+            ? fetch(prevRevision.revisionPath, { credentials: "omit" })
+                .then(function (res) {
+                  if (!res.ok) throw new Error("prev revision " + res.status);
+                  return res.text();
+                })
+                .then(function (html) {
+                  return new DOMParser().parseFromString(html, "text/html");
+                })
+            : Promise.reject(new Error("no previous revisionPath"));
+          prevRootPromise = viaFetch.catch(function (err) {
+            if (snapshotTpl) return snapshotTpl.content;
+            throw err;
+          });
+          return prevRootPromise;
+        }
+
+        function normText(el) {
+          if (el.matches && el.matches("pre.mermaid, .mermaid")) {
+            return (el.getAttribute("data-mermaid-source") || el.textContent || "")
+              .replace(/\s+/g, " ").trim();
+          }
+          return (el.textContent || "").replace(/\s+/g, " ").trim();
+        }
+
+        function blockChildren(el) {
+          return Array.prototype.filter.call(el.children, function (c) {
+            return !c.matches("script,style") && !c.hasAttribute("data-diff-ghost");
+          });
+        }
+
+        function markAdded(el) { el.classList.add("diff-block-added"); counts.added++; }
+        function chipUpdated(el) { el.classList.add("diff-block-updated"); counts.updated++; }
+
+        function insertGhost(oldEl, parent, before) {
+          var ghost = oldEl.cloneNode(true);
+          ghost.classList.add("diff-block-removed");
+          ghost.setAttribute("data-diff-ghost", "1");
+          ghost.removeAttribute("id");
+          Array.prototype.forEach.call(ghost.querySelectorAll("[id]"), function (n) {
+            n.removeAttribute("id");
+          });
+          parent.insertBefore(ghost, before);
+          counts.removed++;
+        }
+
+        function wordDiff(newEl, oldEl) {
+          var parts = Diff.diffWords(oldEl.textContent || "", newEl.textContent || "");
+          var frag = document.createDocumentFragment();
+          parts.forEach(function (p) {
+            if (p.added || p.removed) {
+              var el = document.createElement(p.added ? "ins" : "del");
+              el.className = "diff";
+              el.textContent = p.value;
+              frag.appendChild(el);
+            } else {
+              frag.appendChild(document.createTextNode(p.value));
+            }
+          });
+          newEl.replaceChildren(frag);
+          counts.edited++;
+        }
+
+        function resolvePair(n, o) {
+          if (normText(n) === normText(o)) return;
+          if (n.matches("pre.mermaid, .mermaid, pre, img, video, svg")) { chipUpdated(n); return; }
+          if (n.matches(RECURSE)) { diffContainer(n, o); return; }
+          if (n.matches(PROSE)) { wordDiff(n, o); return; }
+          chipUpdated(n);
+        }
+
+        function diffContainer(newEl, oldEl) {
+          var nb = blockChildren(newEl);
+          var ob = blockChildren(oldEl);
+          if (!nb.length && !ob.length) {
+            if (normText(newEl) !== normText(oldEl)) wordDiff(newEl, oldEl);
+            return;
+          }
+          var parts = Diff.diffArrays(ob.map(normText), nb.map(normText));
+          var oi = 0, ni = 0, ops = [];
+          parts.forEach(function (p) {
+            p.value.forEach(function () {
+              if (p.added) ops.push({ t: "add", n: nb[ni++] });
+              else if (p.removed) ops.push({ t: "del", o: ob[oi++] });
+              else ops.push({ t: "same", o: ob[oi++], n: nb[ni++] });
+            });
+          });
+          var i = 0;
+          while (i < ops.length) {
+            if (ops[i].t === "same") { i++; continue; }
+            var dels = [], adds = [];
+            while (i < ops.length && ops[i].t === "del") dels.push(ops[i++].o);
+            while (i < ops.length && ops[i].t === "add") adds.push(ops[i++].n);
+            var anchor = null;
+            for (var j = i; j < ops.length; j++) {
+              if (ops[j].n) { anchor = ops[j].n; break; }
+            }
+            var paired = Math.min(dels.length, adds.length);
+            for (var k = 0; k < paired; k++) {
+              if (dels[k].tagName === adds[k].tagName) resolvePair(adds[k], dels[k]);
+              else { insertGhost(dels[k], newEl, adds[k]); markAdded(adds[k]); }
+            }
+            for (var ka = paired; ka < adds.length; ka++) markAdded(adds[ka]);
+            for (var kd = paired; kd < dels.length; kd++) {
+              var before = adds.length ? adds[adds.length - 1].nextSibling : anchor;
+              insertGhost(dels[kd], newEl, before);
+            }
+          }
+        }
+
+        function runDiff(prevRoot) {
+          counts = { added: 0, removed: 0, edited: 0, updated: 0 };
+          stash = [];
+          var targets = document.querySelectorAll(
+            "main [data-diff-key], main article.doc > section[id]"
+          );
+          Array.prototype.forEach.call(targets, function (sec) {
+            if (sec.hasAttribute("data-diff-skip")) return;
+            var key = sec.getAttribute("data-diff-key") || sec.id;
+            if (!key) return;
+            var old = null;
+            try {
+              old = prevRoot.querySelector('[data-diff-key="' + CSS.escape(key) + '"]');
+            } catch (e) {}
+            if (!old) {
+              try { old = prevRoot.querySelector("#" + CSS.escape(key)); } catch (e) {}
+            }
+            stash.push({ el: sec, html: sec.innerHTML });
+            if (!old) { markAdded(sec); return; }
+            diffContainer(sec, old);
+          });
+        }
+
+        function shortRev(id) {
+          return id.length <= 10 ? id : id.slice(0, 8) + "\u2026";
+        }
+
+        function updateSummary() {
+          if (!summary) return;
+          summary.textContent = "diff vs " + shortRev(prevLabel()) +
+            " \u00b7 +" + counts.added + " \u00b7 \u2212" + counts.removed +
+            " \u00b7 ~" + (counts.edited + counts.updated);
+          summary.classList.remove("hidden");
+        }
+
+        function restore() {
+          if (stash) {
+            stash.forEach(function (item) {
+              item.el.innerHTML = item.html;
+              item.el.classList.remove("diff-block-added", "diff-block-updated");
+            });
+          }
+          stash = null;
+          on = false;
+          btn.setAttribute("aria-pressed", "false");
+          if (summary) { summary.textContent = ""; summary.classList.add("hidden"); }
+        }
+
+        btn.addEventListener("click", function () {
+          if (on) { restore(); return; }
+          btn.disabled = true;
+          loadPrevRoot().then(function (root) {
+            runDiff(root);
+            on = true;
+            btn.setAttribute("aria-pressed", "true");
+            updateSummary();
+          }).catch(function (err) {
+            console.error("revision diff failed", err);
+          }).then(function () { btn.disabled = false; });
+        });
       })();
     })();
   </script>
