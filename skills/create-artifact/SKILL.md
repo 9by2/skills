@@ -13,7 +13,7 @@ description: >
 license: MIT
 metadata:
   author: 9by2
-  version: "1.4.0"
+  version: "1.4.1"
 ---
 
 # Create Artifact
@@ -175,7 +175,11 @@ Allowed CDN libs (pin versions — see `reference/cdn.md`):
 3. `startOnLoad: false` + `mermaid.run({ nodes })` after doc becomes visible
 4. At least one real diagram when the content involves architecture, flow,
    sequence, or state — prefer diagrams over long prose for those bits
-5. On eval: `waitForSelector(".mermaid svg")` before evidence screenshots
+5. **Always wrap label text in double quotes** — node labels, edge labels,
+   subgraph titles, participant names: `A["Upload (CLI)"]`, `-->|"409: dup"|`.
+   Unquoted ASCII like `(` `)` `[` `]` `{` `}` `:` `;` `/` breaks the Mermaid
+   parser (see `reference/mermaid.md`)
+6. On eval: `waitForSelector(".mermaid svg")` before evidence screenshots
 
 ## Step 3 — Eval evidence (only if requested)
 

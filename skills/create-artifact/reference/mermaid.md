@@ -19,12 +19,43 @@ source as text content. Prefer wrapping in a `<figure>` with a caption.
 ```html
 <figure>
   <pre class="mermaid">flowchart LR
-  A[Author] --> B[Upload]
-  B --> C[Public URL]
+  A["Author"] --> B["Upload"]
+  B --> C["Public URL"]
 </pre>
   <figcaption>Publish path</figcaption>
 </figure>
 ```
+
+## Always double-quote label text
+
+Wrap **all** human-readable text in `"` double quotes — node labels, edge
+labels, subgraph titles, sequence participants/messages, state descriptions.
+Unquoted ASCII punctuation (`(` `)` `[` `]` `{` `}` `:` `;` `/` `<` `>` `&`…)
+breaks the Mermaid parser or gets mis-tokenized as shape/direction syntax.
+
+```mermaid
+flowchart LR
+  A["Upload (CLI)"] -->|"409: duplicate"| B{"Retry?"}
+  B -->|"yes"| C["artifact upload --id <id>"]
+  subgraph W ["Worker / R2"]
+    C --> D["Publish revision"]
+  end
+```
+
+```mermaid
+sequenceDiagram
+  participant CLI as "artifact CLI"
+  CLI->>Worker: "POST /artifact (multipart)"
+  Worker-->>CLI: "201 { url, revisionUrl }"
+```
+
+Rules:
+
+- `A["text"]`, `A("text")`, `A{"text"}` — quote inside the shape brackets
+- Edge labels: `-->|"text"|` or `-- "text" -->`
+- Subgraph titles: `subgraph id ["Title"]`
+- If the text itself contains `"`, use the HTML entity `&quot;`
+- Quote even when it looks safe — labels get edited later and break silently
 
 Supported diagram kinds (use freely when they clarify the review):
 
@@ -92,3 +123,5 @@ await page.waitForSelector(".mermaid svg", { timeout: 5000 });
 - Loading Mermaid from jsDelivr / unpkg
 - Putting Mermaid source inside `<code>` (highlight.js will steal it)
 - Theme toggle that leaves stale Mermaid SVGs from the previous palette
+- Unquoted labels containing `(` `)` `:` `/` etc. — always double-quote label
+  text
