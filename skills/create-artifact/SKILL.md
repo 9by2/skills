@@ -10,6 +10,10 @@ description: >
   /tmp/{sessionId}, optionally captures Playwright/ffmpeg evidence for eval,
   then uploads the whole folder with the artifact CLI (auto-installs CLI).
   Directory names are singular (asset/, reference/, script/) per repo rules.
+license: MIT
+metadata:
+  author: 9by2
+  version: "1.4.0"
 ---
 
 # Create Artifact
@@ -36,7 +40,12 @@ Reference shape: https://artifact.9by2.workers.dev/artifact/019f8d42-27fc-703c-a
 5. **CLI:** Assume the CLI may be missing or stale. Run `script/ensure-cli.sh`
    (or the inline install below) **before** `artifact upload`. Prefer
    `artifact update` when a binary already exists.
-6. **Eval evidence:** If the user asks for eval / verification / screenshots /
+6. **Skill freshness:** Assume this installed skill copy may be stale. Run
+   `script/check-skill-version.sh` at the start of every session; if it
+   reports OUTDATED, tell the user and prefer re-installing the skill
+   (`bunx --bun skills add git@github.com:9by2/skills.git --skill
+   create-artifact`) before proceeding.
+7. **Eval evidence:** If the user asks for eval / verification / screenshots /
    video proof, capture evidence into `/tmp/{sessionId}/evidence/` with
    Playwright (images) and/or ffmpeg (video), reference it in the HTML, and
    upload it with the folder.
@@ -63,9 +72,18 @@ mkdir -p "$ROOT"
 All generated HTML, CSS/JS you author locally, media, and evidence go under
 `$ROOT`. Do not write the bundle into the git repo unless the user asks.
 
-## Step 0 — Ensure CLI (always)
+## Step 0 — Ensure CLI + skill freshness (always)
 
 ```bash
+# 0a. Check this skill copy against the published version (non-fatal)
+script/check-skill-version.sh || true
+```
+
+Exit code `3` means a newer skill version is published — surface the update
+command it prints to the user. Network failures skip the check silently.
+
+```bash
+# 0b. Ensure the artifact CLI
 # from skill root, or inline:
 command -v artifact >/dev/null 2>&1 || \
   curl -fsSL https://artifact.9by2.workers.dev/install.sh | sh
@@ -252,6 +270,7 @@ Give the user:
 - Non–Tokyo Night light themes / purple-gradient / cream-serif redesigns
 - Putting `max-w-*` on `<article>` / the main content column
 - Skipping CLI install / update check
+- Skipping the skill version check, or ignoring an OUTDATED warning silently
 - Renaming section ids / `data-diff-key` between revisions (breaks diff toggle)
 - Dropping the Diff button or the `jsdiff` script when re-publishing with `--id`
 - Republishing with `--id` without the `#diff-prev-snapshot` template (diff
@@ -270,4 +289,5 @@ Give the user:
 | Revision diff toggle + authoring rules | `reference/diff.md` |
 | HTML shell | `asset/index.template.html` |
 | CLI bootstrap | `script/ensure-cli.sh` |
+| Skill version check | `script/check-skill-version.sh` |
 | Screenshots / video | `script/capture-evidence.mjs` |

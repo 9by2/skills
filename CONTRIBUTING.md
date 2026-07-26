@@ -21,6 +21,8 @@ Thanks for improving 9by2 skills.
 
 ## Revise a skill
 
+- Bump `metadata.version` in the skill's `SKILL.md` frontmatter on every published change (installed copies use it for the auto version check).
+
 - Prefer clarifying triggers and progressive disclosure over adding length to `SKILL.md`.
 - Move depth into `reference/` instead of growing the entrypoint.
 - Keep house conventions: singular support folders, portable Markdown, no project-specific inventories.
