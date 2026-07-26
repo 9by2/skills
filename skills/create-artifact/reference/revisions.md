@@ -49,3 +49,7 @@ Copy from `asset/index.template.html`:
 
 Do not hardcode a third-party revision UI. Keep this contract in sync with the
 Worker.
+
+The same payload feeds the global **Diff** toggle (previous revision = entry
+after the current one; list is newest-first). See `diff.md`.
+

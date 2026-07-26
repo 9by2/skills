@@ -24,11 +24,15 @@ Update pins deliberately; prefer these exact versions unless broken.
   crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.min.js"
   crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsdiff/7.0.0/diff.min.js"
+  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 ```
 
 Enable only the active highlight.js theme (`link.disabled = true` on the
 other) when the shell is light or dark. Mermaid is **required** for
 architecture / flow / sequence content. Init and markup rules: `mermaid.md`.
+jsdiff powers the global revision diff toggle (`Diff.diffWords` /
+`Diff.diffArrays`); rules: `diff.md`.
 
 ## Tailwind browser config
 
