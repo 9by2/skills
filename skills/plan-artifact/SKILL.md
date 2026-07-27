@@ -1,12 +1,14 @@
 ---
 name: plan-artifact
 description: >
-  Plan artifact implementations without writing code. Use when the user asks
-  to plan, design, outline, or spec an artifact, review bundle, HTML report,
-  or interactive document — but hasn't explicitly said "implement" or "build
-  it". Produces a structured plan that can be handed to create-artifact.
-  Trigger phrases: "plan an artifact", "outline the structure", "what would
-  this artifact look like", "design proposal", "spec this out".
+  Plan artifact implementations, then automatically hand off to
+  create-artifact and build immediately once the plan is produced — no
+  approval prompt required. Use when the user asks to plan, design, outline,
+  or spec an artifact, review bundle, HTML report, or interactive document.
+  Produces a structured plan and proceeds straight into implementation with
+  create-artifact. Trigger phrases: "plan an artifact", "outline the
+  structure", "what would this artifact look like", "design proposal",
+  "spec this out".
 license: MIT
 metadata:
   author: 9by2
@@ -15,14 +17,15 @@ metadata:
 
 # Plan Artifact
 
-Plan and spec interactive HTML artifacts **without writing code** until the
-user explicitly approves implementation.
+Plan and spec interactive HTML artifacts, then **automatically hand off to
+`create-artifact` and build immediately** once the plan is produced.
 
 ## Purpose
 
-When someone asks about creating an artifact but hasn't committed to building
-it yet, this skill produces a **structured implementation plan** that can be
-approved, iterated, or handed directly to `create-artifact`.
+When someone asks about creating an artifact, this skill first produces a
+**structured implementation plan** for clarity/traceability, then
+immediately proceeds to implement it via `create-artifact` — no separate
+approval step required. Planning and building happen in one flow.
 
 ## Invocation rules
 
@@ -36,14 +39,16 @@ approved, iterated, or handed directly to `create-artifact`.
 
 **Do NOT use this skill when:**
 
-- User explicitly says "implement", "build", "create", or "make the artifact"
-- User has already approved a plan and is ready for code
 - User is updating/republishing an existing artifact (go straight to `create-artifact`)
+- A plan already exists and has been produced in this conversation (go straight to `create-artifact`)
 
 **Handoff to create-artifact:**
 
-- Only after user explicitly approves the plan: "yes", "build it", "go ahead",
-  "implement this", "looks good, let's do it"
+- Automatic. As soon as the plan (Section 6 output) is delivered, immediately
+  load and run `create-artifact` to implement it — do not wait for a
+  separate "yes"/"build it" confirmation.
+- Only pause before implementing if required content is missing (see Step 3)
+  — ask clarifying questions first, then plan and build once content is available.
 - Pass the full plan context when invoking `create-artifact`
 
 ## Planning workflow
@@ -122,7 +127,7 @@ Give the user a rough sense of scope:
 - **Moderate:** 3-5 sections, multiple diagrams, some interactivity (tabs, toggles)
 - **Complex:** Multi-document, heavy interactivity, eval evidence, custom data viz
 
-### 6. Output the plan
+### 6. Output the plan, then build immediately
 
 Deliver a **markdown planning document** with:
 
@@ -132,7 +137,9 @@ Deliver a **markdown planning document** with:
 4. **Diagrams** (which Mermaid diagrams will be included)
 5. **Evidence** (whether eval screenshots/video are needed)
 6. **Complexity** (simple/moderate/complex)
-7. **Next steps** (user approves → implement with `create-artifact`)
+7. **Next steps** — state that implementation is starting now, then
+   immediately load `create-artifact` and build it in the same turn/session.
+   Do not stop and wait for user confirmation.
 
 Example output:
 
@@ -175,21 +182,22 @@ Not required unless you want proof of rendering quality.
 **Moderate** — 5 sections, 2 diagrams, standard navigation, no custom interactivity.
 
 ## Next Steps
-Review this plan. If approved, I'll implement it with `create-artifact` and
-publish to artifact.9by2.workers.dev.
+Implementing now with `create-artifact` and publishing to
+artifact.9by2.workers.dev.
 ```
 
 ## When to load create-artifact
 
-**Do NOT load `create-artifact` during planning** unless:
+**Load `create-artifact` immediately after the plan is delivered** (Step 6)
+and proceed to implement it — this is the default, automatic behavior.
+
+You may also load `create-artifact` earlier during planning if:
 
 - User explicitly asks "how would this be built?" (load for context only)
 - You need to verify a constraint or feasibility detail
 
-**Always load `create-artifact`** when:
-
-- User approves the plan and says to proceed
-- Handing off implementation after plan approval
+**Only defer the handoff** when required content is missing (Step 3) — ask
+clarifying questions, then plan and build once content is available.
 
 ## Checklist before finishing
 
@@ -198,15 +206,14 @@ publish to artifact.9by2.workers.dev.
 - [ ] Identified missing content or asked clarifying questions
 - [ ] Specified which Mermaid diagrams will be included
 - [ ] Estimated complexity (simple/moderate/complex)
-- [ ] Delivered markdown planning doc (not code)
-- [ ] Explained next steps (user must approve before implementation)
-- [ ] Did NOT invoke `create-artifact` without explicit user approval
+- [ ] Delivered markdown planning doc
+- [ ] Immediately loaded `create-artifact` and began implementation after the plan
+- [ ] Only paused for user input if required content was missing
 
 ## Anti-patterns
 
-- Writing HTML/CSS/JS during planning phase
-- Loading `create-artifact` skill when user only asked for a plan
-- Implementing immediately without user approval
+- Writing HTML/CSS/JS during the planning section itself (plan first, then hand off to `create-artifact` to write code)
+- Stopping after the plan and waiting for approval when all required content is available
 - Skipping content requirements (missing specs, data, or context)
 - Proposing custom themes or non-Mermaid diagram libraries
 - Ignoring complexity — setting unrealistic expectations
