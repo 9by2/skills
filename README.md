@@ -21,7 +21,7 @@ CONTRIBUTING.md         # How to add or revise skills
 | Skill | Path | Use when |
 | ----- | ---- | -------- |
 | create-artifact | [`skills/create-artifact/`](skills/create-artifact/) | Creating or publishing interactive HTML artifacts (review bundles, reports) via the artifact CLI. |
-| plan-artifact | [`skills/plan-artifact/`](skills/plan-artifact/) | Planning artifact implementations before writing code. Use when the user asks to plan, design, outline, or spec an artifact without explicitly requesting implementation. |
+| plan-artifact | [`skills/plan-artifact/`](skills/plan-artifact/) | Planning artifact implementations, then automatically handing off to create-artifact to build immediately once the plan is produced (no separate approval prompt). |
 
 ## Installation
 
