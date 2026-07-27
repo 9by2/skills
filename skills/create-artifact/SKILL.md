@@ -13,7 +13,7 @@ description: >
 license: MIT
 metadata:
   author: 9by2
-  version: "1.4.1"
+  version: "1.5.0"
 ---
 
 # Create Artifact
@@ -128,6 +128,13 @@ Layout pattern (match the example's job, not its green paper theme):
 
 - Sticky sidebar: brand, status badges, **revision dropdown**, doc nav +
   section anchors
+- **Collapsible sidebar (required in template):** `#sidebar-toggle` inside the
+  sidebar hides it, the floating `#sidebar-open` button restores it, and
+  `Cmd/Ctrl+B` or `[` toggles. State lives on `<html data-sidebar>`, is set
+  pre-paint by the head bootstrap, and persists via
+  `localStorage["artifact-sidebar"]`. Below `lg`, tapping a sidebar link
+  auto-collapses (drawer behaviour). Do not remove the ids — the CSS keys off
+  `#app-shell` / `#sidebar`.
 - Main: one `<article>` per doc; toggle `.active` via small inline JS
 - **No width caps on `<article>`:** never add `max-w-*` (or similar) to the
   article / main content column — it should use the full width beside the
